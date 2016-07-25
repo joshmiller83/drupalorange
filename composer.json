@@ -27,7 +27,19 @@
     "drupal/core": "8.1.x-dev",
     "drupal/console": "~0.10",
     "drupal/commerce": "8.2.x-dev",
-    "drupalcommerce/commerce_base": "dev-8.x-1.x"
+    "drupalcommerce/commerce_base": "dev-8.x-1.x",
+    "drupal/admin_toolbar": "8.x-1.15",
+    "drupal/contact_storage": "8.x-1.0-beta4",
+    "drupal/ctools": "8.x-3.0-alpha26",
+    "drupal/google_analytics": "8.x-2.0",
+    "drupal/honeypot": "8.x-1.23",
+    "drupal/imce": "8.x-1.2",
+    "drupal/metatag": "8.x-1.0-beta9",
+    "drupal/pathauto": "8.x-1.0-alpha3",
+    "drupal/simple_sitemap": "8.x-2.5",
+    "drupal/taxonomy_menu": "8.x-3.2",
+    "drupal/token": "8.x-1.0-alpha2",
+    "drupal/userprotect": "8.x-1.0-rc1"
   },
   "require-dev": {
     "behat/mink": "~1.7",
