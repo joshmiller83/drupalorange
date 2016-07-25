@@ -5,6 +5,8 @@
 #
 # Based for simpletest upon:
 #   https://github.com/sonnym/travis-ci-drupal-module-example
+#
+# Also based on https://github.com/drupalcommerce/project-base
 
 language: php
 
@@ -12,7 +14,9 @@ sudo: false
 
 php:
   - 5.6
-  - 7
+  - 7.0
+
+sudo: false
 
 matrix:
   fast_finish: true
@@ -90,6 +94,8 @@ env:
     #- DRUPAL_TI_RUNNERS="phpunit simpletest behat"
     # Use phpunit-core to test modules with phpunit with Drupal 8 core.
     - DRUPAL_TI_RUNNERS="phpunit-core"
+    - RELEASE=stable
+    - RELEASE=dev
 
 mysql:
   database: drupal_travis_db
@@ -97,11 +103,15 @@ mysql:
   encoding: utf8
 
 before_install:
-  - composer self-update
+  - echo 'sendmail_path = /bin/true' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
+  - phpenv config-rm xdebug.ini
+  - composer --verbose self-update
+  - composer --version
   - composer global require "lionsad/drupal_ti:1.*"
   - drupal-ti before_install
 
 install:
+  - composer --verbose install
   - drupal-ti install
 
 before_script:
@@ -109,6 +119,18 @@ before_script:
 
 script:
   - drupal-ti script
+  - if [[ $RELEASE = dev ]]; then composer --verbose require --no-update drupal/core:8.0.x-dev; fi;
+  - if [[ $RELEASE = dev ]]; then composer --verbose update; fi;
+  - cd $TRAVIS_BUILD_DIR/web
+  - ./../vendor/bin/drupal --version
+  - ./../vendor/bin/drupal init
+  - ./../vendor/bin/drupal site:install --db-type=sqlite --db-file=sites/default/files/.ht.sqlite --no-interaction
+  - ./../vendor/bin/drupal server 127.0.0.1:8080 &
+  - sleep 3
+  # Skip core/tests/Drupal/Tests/ComposerIntegrationTest.php because web/ has no composer.json
+  - ./../vendor/bin/phpunit -c core --testsuite unit --exclude-group Composer
+  # Exit if the install profile didn't default.
+  - ./../vendor/bin/drupal site:status || grep -q "commerce_base" || exit 1;
 
 after_script:
   - drupal-ti after_script
